@@ -1,5 +1,6 @@
 -- Cohort retention: compare adopters vs non-adopters at 30/60/90 days
 -- Key question: does using the AI Caption Generator improve retention?
+-- Uses independent windows: 30d = day 1-30, 60d = day 31-60, 90d = day 61-90
 with users as (
     select * from {{ ref('dim_users') }}
 ),
@@ -20,7 +21,7 @@ cohort_users as (
     where signup_date < '2025-06-01'  -- Pre-launch signups only
 ),
 
--- Check if user was active in each retention window (post-launch)
+-- Check if user was active in each independent retention window
 user_activity as (
     select
         cu.user_id,
@@ -28,17 +29,22 @@ user_activity as (
         cu.adoption_segment,
         cu.current_plan,
 
-        -- Was active within 30/60/90 days after feature launch (2025-06-01)
+        -- Independent windows after feature launch (2025-06-01)
+        -- 30d: day 1-30
         max(case
             when e.event_date between '2025-06-01' and date_add('2025-06-01', interval 30 day)
             then 1 else 0
         end) as active_30d,
+        -- 60d: day 31-60
         max(case
-            when e.event_date between '2025-06-01' and date_add('2025-06-01', interval 60 day)
+            when e.event_date between date_add('2025-06-01', interval 31 day)
+                                  and date_add('2025-06-01', interval 60 day)
             then 1 else 0
         end) as active_60d,
+        -- 90d: day 61-90
         max(case
-            when e.event_date between '2025-06-01' and date_add('2025-06-01', interval 90 day)
+            when e.event_date between date_add('2025-06-01', interval 61 day)
+                                  and date_add('2025-06-01', interval 90 day)
             then 1 else 0
         end) as active_90d
 

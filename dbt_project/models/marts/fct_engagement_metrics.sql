@@ -12,7 +12,7 @@ users as (
 -- Daily active users by month and adoption segment
 daily_active as (
     select
-        {{ dbt_utils.date_trunc('month', 'e.event_date') }} as activity_month,
+        date_trunc(e.event_date, month) as activity_month,
         e.event_date,
         u.adoption_segment,
         count(distinct e.user_id) as dau
@@ -24,7 +24,7 @@ daily_active as (
 -- Monthly active users
 monthly_active as (
     select
-        {{ dbt_utils.date_trunc('month', 'e.event_date') }} as activity_month,
+        date_trunc(e.event_date, month) as activity_month,
         u.adoption_segment,
         count(distinct e.user_id) as mau
     from events e

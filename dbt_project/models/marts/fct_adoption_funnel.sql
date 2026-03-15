@@ -7,7 +7,7 @@ with users as (
 -- Monthly cohorts based on when users were first exposed
 monthly_funnel as (
     select
-        {{ dbt_utils.date_trunc('month', 'first_exposed_date') }} as exposure_month,
+        date_trunc(first_exposed_date, month) as exposure_month,
         current_plan,
 
         -- Funnel counts

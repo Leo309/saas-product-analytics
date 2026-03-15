@@ -203,8 +203,21 @@ def generate_events(users: pd.DataFrame) -> pd.DataFrame:
         engagement = random.uniform(0.1, 1.0)
         events_per_month = int(engagement * 25)
 
+        # Simulate churn: each user has a chance of becoming inactive
+        # Lower engagement = higher churn probability
+        # Free users churn more than paid users
+        plan = user["plan"]
+        base_churn = {"free": 0.12, "pro": 0.06, "enterprise": 0.03}.get(plan, 0.10)
+        monthly_churn_prob = base_churn * (1.5 - engagement)  # Low engagement = higher churn
+
         current_month = signup.replace(day=1)
-        while current_month <= DATE_END:
+        is_active = True
+        while current_month <= DATE_END and is_active:
+            # Check if user churns this month (not in first month)
+            if current_month > signup.replace(day=1) and random.random() < monthly_churn_prob:
+                is_active = False
+                break
+
             # Some monthly variation
             n_events = max(1, int(events_per_month * random.uniform(0.5, 1.5)))
 

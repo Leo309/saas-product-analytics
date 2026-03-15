@@ -44,3 +44,4 @@ Snipaste_*.png
 # GCP credentials
 *-credentials.json
 service-account*.json
+saas-feature-adoption-*.json

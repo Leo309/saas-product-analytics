@@ -138,6 +138,31 @@ saas-product-analytics/
 | Analysis Depth | Broad (revenue, product, channel) | Deep (single feature launch analysis) |
 | Business Domain | Multi-channel e-commerce | B2B SaaS product analytics |
 
+## Looker Studio Dashboard
+
+Feature adoption analysis with adoption funnel, cohort retention, DAU/MAU engagement trend, and time-to-adopt breakdown.
+
+![Feature Adoption Dashboard](reports/dashboard_feature_adoption.png)
+
+### Key Findings
+
+- **702 out of 1,970 users adopted** the AI Caption Generator (36% adoption rate)
+- **Repeat adopters retain best**: 84.7% at 30d → 72.6% at 90d (vs 78.3% → 65.0% for exposed non-adopters)
+- **Enterprise users adopt fastest**: ~10 days avg time-to-adopt vs ~8.5 days for free tier
+- **DAU/MAU ratio increased** post-launch for adopter segments, showing improved stickiness
+
+## Pipeline Orchestration
+
+Airflow DAG automates the full dbt pipeline: `dbt_deps → dbt_run_staging → dbt_run_marts → dbt_test → dbt_docs_generate`
+
+![Airflow DAG](reports/airflow_dag.png)
+
+## Data Quality
+
+26 dbt tests — all passing (not_null, unique, accepted_values, relationships).
+
+![dbt Test Results](reports/dbt_test_results.png)
+
 ## Getting Started
 
 ### Prerequisites

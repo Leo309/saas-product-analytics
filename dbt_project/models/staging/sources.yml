@@ -1,0 +1,39 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw data loaded from CSV files into BigQuery"
+    database: "{{ var('project_id', 'your-gcp-project') }}"
+    schema: raw
+    tables:
+      - name: users
+        description: "User profiles with plan tier and company info"
+        columns:
+          - name: user_id
+            description: "Unique user identifier"
+          - name: signup_date
+            description: "Date the user signed up"
+
+      - name: subscriptions
+        description: "Subscription lifecycle events (created, upgraded, downgraded, cancelled)"
+        columns:
+          - name: subscription_id
+            description: "Unique subscription event identifier"
+          - name: user_id
+            description: "Foreign key to users"
+
+      - name: product_events
+        description: "User activity logs — login, post_create, post_schedule, etc."
+        columns:
+          - name: event_id
+            description: "Unique event identifier"
+          - name: user_id
+            description: "Foreign key to users"
+
+      - name: feature_exposures
+        description: "AI Caption Generator exposure and usage events (post-launch only)"
+        columns:
+          - name: exposure_id
+            description: "Unique exposure/usage event identifier"
+          - name: user_id
+            description: "Foreign key to users"

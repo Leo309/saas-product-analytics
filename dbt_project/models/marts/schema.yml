@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: dim_users
+    description: "Enriched user dimension with feature adoption segment and subscription status"
+    columns:
+      - name: user_id
+        description: "Unique user identifier"
+        tests:
+          - unique
+          - not_null
+      - name: adoption_segment
+        description: "Feature adoption status: repeat_adopter, one_time_adopter, exposed_non_adopter, unexposed"
+        tests:
+          - accepted_values:
+              values: ['repeat_adopter', 'one_time_adopter', 'exposed_non_adopter', 'unexposed']
+      - name: days_to_adopt
+        description: "Days from first exposure to first use (null if not adopted)"
+
+  - name: fct_adoption_funnel
+    description: "Monthly feature adoption funnel by plan tier — exposed → first use → repeat use"
+    columns:
+      - name: exposure_month
+        description: "Month of first exposure"
+        tests:
+          - not_null
+      - name: exposure_to_use_rate
+        description: "% of exposed users who tried the feature"
+      - name: overall_adoption_rate
+        description: "% of exposed users who became repeat users"
+
+  - name: fct_cohort_retention
+    description: "30/60/90-day retention comparison between adopters and non-adopters"
+    columns:
+      - name: adoption_segment
+        description: "User segment for retention comparison"
+        tests:
+          - not_null
+      - name: cohort_size
+        description: "Number of users in this segment"
+      - name: retention_30d
+        description: "% retained after 30 days post-launch"
+      - name: retention_60d
+        description: "% retained after 60 days post-launch"
+      - name: retention_90d
+        description: "% retained after 90 days post-launch"
+
+  - name: fct_engagement_metrics
+    description: "DAU/MAU ratio by month and adoption segment, with pre/post launch flag"
+    columns:
+      - name: activity_month
+        description: "Calendar month"
+        tests:
+          - not_null
+      - name: dau_mau_ratio
+        description: "Daily active / monthly active users (%)"
+      - name: period
+        description: "pre_launch, launch_month, or post_launch"

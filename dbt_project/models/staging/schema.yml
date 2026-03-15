@@ -1,0 +1,92 @@
+version: 2
+
+models:
+  - name: stg_users
+    description: "Cleaned user profiles — lowercase emails, valid signup dates"
+    columns:
+      - name: user_id
+        description: "Unique user identifier (e.g., user_00001)"
+        tests:
+          - unique
+          - not_null
+      - name: email
+        description: "User email, lowercased"
+        tests:
+          - not_null
+      - name: signup_date
+        description: "Date the user signed up"
+        tests:
+          - not_null
+      - name: plan
+        description: "Subscription plan at signup"
+        tests:
+          - accepted_values:
+              values: ['free', 'pro', 'enterprise']
+
+  - name: stg_subscriptions
+    description: "Cleaned subscription lifecycle events"
+    columns:
+      - name: subscription_id
+        description: "Unique subscription event identifier"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Foreign key to users"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_users')
+              field: user_id
+      - name: event_type
+        description: "Subscription event type"
+        tests:
+          - accepted_values:
+              values: ['created', 'upgraded', 'downgraded', 'cancelled']
+      - name: plan
+        description: "Plan tier"
+        tests:
+          - accepted_values:
+              values: ['free', 'pro', 'enterprise']
+
+  - name: stg_events
+    description: "Cleaned and deduplicated user activity events"
+    columns:
+      - name: event_id
+        description: "Unique event identifier"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Foreign key to users"
+        tests:
+          - not_null
+      - name: event_type
+        description: "Type of user action"
+        tests:
+          - accepted_values:
+              values: ['login', 'post_create', 'post_schedule', 'analytics_view',
+                       'media_upload', 'team_manage', 'inbox_reply', 'report_export']
+
+  - name: stg_feature_exposures
+    description: "AI Caption Generator exposure and usage events"
+    columns:
+      - name: exposure_id
+        description: "Unique exposure/usage event identifier"
+        tests:
+          - unique
+          - not_null
+      - name: user_id
+        description: "Foreign key to users"
+        tests:
+          - not_null
+      - name: event_type
+        description: "Exposure funnel stage"
+        tests:
+          - accepted_values:
+              values: ['exposed', 'first_use', 'repeat_use']
+      - name: feature_name
+        description: "Feature name — always 'ai_caption_generator'"
+        tests:
+          - accepted_values:
+              values: ['ai_caption_generator']

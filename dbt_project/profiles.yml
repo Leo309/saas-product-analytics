@@ -1,0 +1,34 @@
+# Project-local dbt profile. dbt 1.5+ auto-discovers profiles.yml next to dbt_project.yml.
+# Secrets come from environment variables — copy .env.example to .env, fill it in, then `source .env`.
+#
+# Targets:
+#   dev             — BigQuery (default, matches existing pipeline)
+#   snowflake_prod  — Snowflake (added in the 2026-05-17 sprint for parallel-warehouse demo)
+#
+# DBT_PROFILES_DIR must point at this directory. The provided .env sets that for you.
+
+saas_feature_adoption:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: "{{ env_var('GCP_DATASET', 'analytics') }}"
+      keyfile: "{{ env_var('GCP_KEYFILE_PATH') }}"
+      location: "{{ env_var('GCP_LOCATION', 'US') }}"
+      threads: 4
+      timeout_seconds: 300
+      priority: interactive
+
+    snowflake_prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'TRANSFORMER') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'ANALYTICS') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'TRANSFORMING_WH') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'STAGING') }}"
+      threads: 4
+      client_session_keep_alive: False
